@@ -1,72 +1,37 @@
 import serial as s
-import numpy as np
-from serial.tools import list_ports
-import time
+from serial_utils import SerialUtil, list_serial_ports
+from can_addr import CAN_DG, CAN_SN
 
 PORT = 'COM6'
 BAUD_RATE = 115200
-L_SN = "0d"
-R_SN = "04"
 SECONDS = 0.5
 
-def list_serial_ports():
-    ports = list_ports.comports()
-    for port in ports:
-        print(f"Port: {port.device} - {port.description}")
-
-def write_to_serial(msg):
-    print(f"sending: {msg}")
-    msg = msg + "\n\r"
-    ser.write(msg.encode())
-    time.sleep(0.1)  # Optional delay
-
-def read_from_serial():
-    if ser.in_waiting > 0:
-        data = ser.read_all().decode('utf-8').strip()
-        print(f"Received: {data}")
+PING_PACKET_ID = "f5"
+PING_PACKET_DATA = "00 00 0f"
 
 try:
     list_serial_ports()
+    query = input(f"{PORT} is correct? (y/n): ")
+    if query == 'y':
+        s = SerialUtil(PORT, BAUD_RATE)  # Replace 'COM3' with your serial port
+        print("Serial port connected")
 
-    ser = s.Serial(PORT, BAUD_RATE)  # Replace 'COM3' with your serial port
-    print("Serial port connected")
+        s.read_from_serial(False)
 
-    write_to_serial(f"1 04 {L_SN} 00 00")
-    write_to_serial(f"1 04 {R_SN} 00 00")
-    write_to_serial(f"1 04 04 00 00")
-
-    write_to_serial(f"1 04 {L_SN} f5 00 00 0f")
-    read_from_serial()
-    read_from_serial()
-    
-    write_to_serial(f"1 04 {R_SN} f5 00 00 0f")
-    read_from_serial()
-    read_from_serial()
-
-    write_to_serial(f"1 04 04 f5 00 00 0f")
-    read_from_serial()
-    read_from_serial()
-
-    write_to_serial(f"1 07 02 f5 00 00 0f")
-    read_from_serial()
-    read_from_serial()
-
-    write_to_serial(f"1 07 12 f5 00 00 0f")
-    read_from_serial()
-    read_from_serial()
-
-    write_to_serial(f"1 07 03 f5 00 00 0f")
-    read_from_serial()
-    read_from_serial()
-
-    write_to_serial(f"1 07 13 f5 00 00 0f")
-    read_from_serial()
-    read_from_serial()
+        for dg_k, dg_v in CAN_DG.items():
+            if dg_k in CAN_SN.keys():
+                for sn_k, sn_v in CAN_SN[dg_k].items():
+                    s.write_to_serial(f"1 {dg_v} {sn_v} {PING_PACKET_ID} {PING_PACKET_DATA}")
+                    data = s.read_latest_line()
+                    if data:
+                        print(f">> {sn_k} in {dg_k} group: SUCCESS")
+                    else:
+                        print(f">> {sn_k} in {dg_k} group: FAIL")
 
 except s.SerialException as e:
     print(f"Error: {e}")
 
 finally:
-    if 'ser' in locals() and ser.is_open:
-        ser.close()
+    if 's' in locals() and s.ser.is_open:
+        s.ser.close()
         print("Serial port closed")
