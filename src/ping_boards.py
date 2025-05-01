@@ -2,7 +2,7 @@ import serial as s
 from serial_utils import SerialUtil, list_serial_ports
 from can_addr import CAN_DG, CAN_SN
 
-PORT = 'COM6'
+PORT = 'COM7'
 BAUD_RATE = 115200
 SECONDS = 0.5
 
@@ -23,10 +23,10 @@ try:
                 for sn_k, sn_v in CAN_SN[dg_k].items():
                     s.write_to_serial(f"1 {dg_v} {sn_v} {PING_PACKET_ID} {PING_PACKET_DATA}")
                     data = s.read_latest_line()
-                    if data:
-                        print(f">> {sn_k} in {dg_k} group: SUCCESS")
-                    else:
-                        print(f">> {sn_k} in {dg_k} group: FAIL")
+                    # if data:
+                    #     print(f">> {sn_k} in {dg_k} group: SUCCESS")
+                    # else:
+                    #     print(f">> {sn_k} in {dg_k} group: FAIL")
 
 except s.SerialException as e:
     print(f"Error: {e}")

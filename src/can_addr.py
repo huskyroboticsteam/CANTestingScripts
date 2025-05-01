@@ -6,8 +6,10 @@ CAN_DG = {
 
 CAN_SN = {
     "MOTOR": {
+        "ZERO"      : "00",
         "BASE"      : "01",
         "SHOULDER"  : "02",
+        "THREE"     : "03",
         "ELBOW"     : "04",
         "HAND"      : "06",
         "L_TREAD"   : "0d",
