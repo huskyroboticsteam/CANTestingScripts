@@ -5,7 +5,7 @@ import time
 from serial_utils import SerialUtil, list_serial_ports
 from can_addr import CAN_DG, CAN_SN
 
-PORT = 'COM7'
+PORT = 'COM18'
 BAUD_RATE = 115200
 SECONDS = 0.5
 
