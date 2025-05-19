@@ -45,3 +45,5 @@ set_vel(10)
 #while True:
 #    set_vel(10)
 #    get_pos_vel()
+bus.shutdown()
+
